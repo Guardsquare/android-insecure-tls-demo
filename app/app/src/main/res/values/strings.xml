@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Insecure Communication</string>
+    <string name="title_activity_webview">WebviewActivity</string>
+    <string name="abort">Abort</string>
+</resources>

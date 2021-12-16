@@ -1,0 +1,90 @@
+version: "3.7"
+services:
+  front-envoy:
+    image: emulator_envoy:latest
+    container_name: emulator_envoy
+    networks:
+      - envoymesh
+    expose:
+      - "8080"
+      - "8001"
+      - "8443"
+    ports:
+      - "80:8080"
+      - "443:8443"
+      - "8001:8001"
+
+  emulator:
+    image: emulator_emulator:latest
+    container_name: emulator_emulator
+    networks:
+      envoymesh:
+        aliases:
+          - emulator
+    devices:
+      - "/dev/kvm:/dev/kvm"
+    shm_size: 128M
+    expose:
+      - "8554"
+    ports:
+      - "5555:5555"
+      - "5554:5554"
+    secrets:
+      - adbkey
+
+  jwt_signer:
+    image: emulator_jwt_signer:latest
+    container_name: emulator_jwt_signer
+    networks:
+      envoymesh:
+        aliases:
+          - jwt_signer
+    expose:
+      - "8080"
+
+  nginx:
+    image: emulator_nginx:latest
+    container_name: emulator_nginx
+    networks:
+      envoymesh:
+        aliases:
+          - nginx
+    expose:
+      - "80"
+
+  server:
+    image: nginx:latest
+    container_name: emulator_backend
+    networks:
+      envoymesh:
+        aliases:
+          - www.mitmtest.com
+    expose:
+      - "80"
+      - "443"
+    volumes:
+      - ./backend/nginx-backend.conf:/etc/nginx/nginx.conf
+      - ./backend/nginx-certs:/etc/nginx-certs
+      - ./backend/server-files:/var/www/html
+
+  eve:
+    privileged: true
+    build: eve
+    container_name: emulator_eve
+    volumes:
+      - ./eve/eve_files:/eve_files
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv6.conf.all.forwarding=1
+      - net.ipv4.conf.all.send_redirects=0
+    networks:
+      envoymesh:
+        aliases:
+          - eve
+
+networks:
+  envoymesh: {}
+
+secrets:
+  adbkey:
+    file: ~/.android/adbkey
