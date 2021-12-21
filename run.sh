@@ -29,7 +29,7 @@ progress "Launching app on emulator"
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 adb shell am start -n "com.example.insecuretls/com.example.insecuretls.WebviewActivity" -a android.intent.action.MAIN -c android.intent.category.LAUNCHER
 
-progress "App launched successfully! Opening https://localhost in your web browser"
+progress "App launched successfully! Opening https://localhost in your web browser. Login credentials are 'user' and 'pass'"
 python3 -m webbrowser https://localhost
 
 progress "Entering attacker shell. Note that exiting it will shut down the containers"

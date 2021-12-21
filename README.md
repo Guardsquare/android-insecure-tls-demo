@@ -42,7 +42,9 @@ the backend server and the attacker. Setting this network up is explained in the
 ## Prerequisites
 
 In order to launch the demo environment, you will need to have [docker-compose](https://docs.docker.com/compose/install/)
-installed, as well as Python3, NodeJS and npm. All other necessary dependencies will be downloaded automatically.
+installed, as well as Python3, NodeJS and npm. Also make sure to have the Android SDK installed (SDK platform version 31).
+The `ANDROID_SDK_ROOT` environment variable needs to point to its installation directory, usually `~/Android/Sdk`.
+All other necessary dependencies will be downloaded automatically.
 
 ## Docker Setup
 
@@ -51,7 +53,8 @@ depending on your system performance and Internet speed. Afterwards you can laun
 This script takes care of several things:
 
 1. The Android emulator will be booted and a web interface to interact with it is made available on
-   https://localhost (Note that the website uses a self-signed certificate).
+   https://localhost (Note that the website uses a self-signed certificate). Login with username `user` and password
+   `pass`. Then you should see the emulator screen, with which you can interact using your mouse.
 2. In the meantime, the example app is compiled and once the emulator is fully booted up it is installed
    and launched automatically.
 3. Once the app is running, a bash shell is opened on the attacker container so that you can interactively
