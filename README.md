@@ -2,9 +2,13 @@
 
 ## Overview
 
-This repository contains the files you need to run the demos for our
-[blog post](https://www.guardsquare.com/blog/insecure-tls-certificate-checking-in-android-apps)
-on insecure TLS certificate checking in Android apps. There are two parts to the repo:
+This repository contains the files you need to run the demos for our blog post series
+on TLS certificate checking in Android apps. The
+[first post](https://www.guardsquare.com/blog/insecure-tls-certificate-checking-in-android-apps)
+covers common implementation errors and the
+[second one](https://guardsquare.com/blog/how-to-securely-implement-tls-certificate-checking-in-android-apps)
+then explains how you can securely configure TLS connections even in cases when you have
+to deviate from the default behavior. There are two parts to the repo:
 
 1. **Example app:** In [app/](app/) you will find the full AndroidStudio project for the example app that showcases
    different TLS checking implementations.
@@ -27,7 +31,7 @@ To showcase different insecure ways of doing so, the app consists of several tab
 fetches the data using a different workaround commonly found online. You can check out the corresponding
 source code in [WebViewFragment.kt](app/app/src/main/kotlin/com/example/insecuretls/ui/main/WebViewFragment.kt).
 
-In the blog post we cover three different types of implementation errors:
+In the first blog post we cover three different types of implementation errors:
 
 1. **[WebView ignores all SSL errors](https://www.guardsquare.com/blog/insecure-tls-certificate-checking-in-android-apps#webview):**
    See [setupInsecureWebView()](app/app/src/main/kotlin/com/example/insecuretls/ui/main/WebViewFragment.kt#L58)
@@ -35,6 +39,19 @@ In the blog post we cover three different types of implementation errors:
    See [setupInsecureTrustManager()](app/app/src/main/kotlin/com/example/insecuretls/ui/main/WebViewFragment.kt#L108)
 3. **[Disabled Host Name Checks](https://www.guardsquare.com/blog/insecure-tls-certificate-checking-in-android-apps#host_name):**
    See [setupInsecureHostnameVerifier()](app/app/src/main/kotlin/com/example/insecuretls/ui/main/WebViewFragment.kt#L82)
+
+The second blog post explains how to configure non-standard certificate checking behaviors in a secure way:
+
+1. **[Allowing Custom Certificate Authorities](https://www.guardsquare.com/blog/how-to-securely-implement-tls-certificate-checking-in-android-apps#Allowing_Custom_Certificate_Authorities):**
+   1. **SDK 24 And Newer:** See [setupNetworkSecurityConfig()](app/app/src/main/kotlin/com/example/insecuretls/ui/main/WebViewFragment.kt#L165)
+      and [network_security_config.xml](app/app/src/main/res/xml/network_security_config.xml)
+   2. **Older Versions:** See [setupCustomCaLegacy()](app/app/src/main/kotlin/com/example/insecuretls/ui/main/WebViewFragment.kt#L211)
+      and [setupCustomCaLegacyWebview()](app/app/src/main/kotlin/com/example/insecuretls/ui/main/WebViewFragment.kt#L260)
+2. **[Certificate Pinning](https://www.guardsquare.com/blog/how-to-securely-implement-tls-certificate-checking-in-android-apps#Certificate_Pinning):**
+   1. **SDK 24 And Newer:** See [setupNetworkSecurityConfig()](app/app/src/main/kotlin/com/example/insecuretls/ui/main/WebViewFragment.kt#L165)
+      and [network_security_config.xml](app/app/src/main/res/xml/network_security_config.xml)
+   2. **Older Versions:** See [setupPinningLegacy()](app/app/src/main/kotlin/com/example/insecuretls/ui/main/WebViewFragment.kt#L323)
+      and [setupPinningLegacyWebview()](app/app/src/main/kotlin/com/example/insecuretls/ui/main/WebViewFragment.kt#L405)
 
 This app will be installed to a containerized Android emulator that lives in the same virtual network as
 the backend server and the attacker. Setting this network up is explained in the next section.
@@ -60,11 +77,18 @@ This script takes care of several things:
 3. Once the app is running, a bash shell is opened on the attacker container so that you can interactively
    experiment with the man-in-the-middle setup. As a quick start, you can simply execute the [start.sh](eve/eve_files/start.sh)
    script that you will find in the current working directory where the shell was spawned (`/eve_files` on the container).
+   
    This script sets up the attacker proxy using the [mitmproxy](https://mitmproxy.org/) tool without needing
    any user input. You can then observe intercepted traffic in the console that will show up.
    To exit the console and stop the attack, simply press Ctrl+C and confirm. Should you want to deviate
    from the default attacker script, feel free to inspect [start.sh](eve/eve_files/start.sh) and the associated
    [proxy.py](eve/eve_files/proxy.py) file.
-4. After you are done exploring the demos, simply exit the attacker shell as usual (Ctrl+D or typing `exit`).
+   
+   If you would like to experiment with the certificate pinning implementations,
+   `start.sh` allows you to pass `--custom-ca`, which will instruct `mitmproxy` to use a certificate
+   that was signed by the same custom CA that the example server uses. This  mimics the situation that the
+   attacker is indeed able to get a valid certificate for your domain, which would be trusted under normal circumstances.
+   The additional certificate pinning step however is able to successfully detect the attack and refuse the connection.
+5. After you are done exploring the demos, simply exit the attacker shell as usual (Ctrl+D or typing `exit`).
    This will automatically shut down the containers in a clean way.
 

